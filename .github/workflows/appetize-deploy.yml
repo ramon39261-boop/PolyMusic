@@ -15,7 +15,7 @@ jobs:
       - name: Configurar versión de Xcode
         uses: maxim-lobanov/setup-xcode@v1
         with:
-          xcode-version: '15.2'
+          xcode-version: '26.6.0'
 
       - name: Compilar ejecutable para Simulador de iOS
         run: |
