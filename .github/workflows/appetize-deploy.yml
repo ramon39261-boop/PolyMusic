@@ -1,0 +1,38 @@
+name: Build and Upload to Appetize
+
+on:
+  push:
+    branches: [ main, master ]
+
+jobs:
+  build-and-deploy:
+    runs-on: macos-latest
+
+    steps:
+      - name: Descargar código fuente
+        uses: actions/checkout@v4
+
+      - name: Configurar versión de Xcode
+        uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: '15.2'
+
+      - name: Compilar ejecutable para Simulador de iOS
+        run: |
+          xcodebuild -project iOS_Target/PolyMusic.xcodeproj \
+                     -scheme PolyMusic \
+                     -configuration Release \
+                     -sdk iphonesimulator \
+                     -derivedDataPath build
+
+      - name: Comprimir paquete .app en formato .zip
+        run: |
+          cd build/Build/Products/Release-iphonesimulator/
+          zip -r PolyMusic.zip PolyMusic.app
+
+      - name: Subir binario a Appetize.io
+        uses: appetizeio/github-action-appetize@v1.1.0
+        with:
+          apiToken: ${{ secrets.APPETIZE_API_TOKEN }}
+          appFile: build/Build/Products/Release-iphonesimulator/PolyMusic.zip
+          platform: 'ios'
